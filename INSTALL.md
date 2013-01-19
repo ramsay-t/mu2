@@ -9,4 +9,4 @@ Installing
 
 The shell scripts in *bin/* provide starting points for common usages. The *mu2* script will generate a specified number of mutants into a specified folder, applying one mutation randomly chosen from all the applicable mutations.
 
-The *apply_logging* script will insert logging calls into all functions to track the variable values used in calls. When the mutated module is called it will generate a file named &lt;module&gt;.log that contains one line per function call, in the format: &lt;function name&gt; [arguments list]
+The *apply_instrumentation* script will insert logging calls into all functions to track the variable values used in calls. When the mutated module is called it will generate a file named &lt;module&gt;.log that contains one line per function call, in the format: &lt;function name&gt; [arguments list]. The mutated module must be run with the mu2 ebin folder in the erlang path.
