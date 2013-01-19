@@ -1,7 +1,7 @@
 Installing
 ===
 
-1) Make sure the Wrangler sources are installed (see: ).
+1) Make sure the Wrangler sources are installed (see: https://github.com/RefactoringTools/Wrangler).
 
 2) Set the correct path to the Wrangler sources in both Makefile and include/install.hrl.
 
