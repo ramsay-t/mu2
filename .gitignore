@@ -1,0 +1,4 @@
+*~
+*.beam
+erl_crach.dump
+mutants/*
