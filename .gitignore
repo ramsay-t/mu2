@@ -2,3 +2,8 @@
 *.beam
 erl_crach.dump
 mutants/*
+*.dump
+
+test.erl
+
+test_mut.erl
