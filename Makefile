@@ -1,4 +1,5 @@
-LIBS=-pa ../wrangler/ebin
+WRANGLER_ROOT=../wrangler
+LIBS=-pa $(WRANGLER_ROOT)/ebin
 SOURCES=$(wildcard src/*.erl)
 
 default: all
