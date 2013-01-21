@@ -32,6 +32,9 @@ convert_args([A | AS], Next) ->
 convert_args(Wibble, _Next) ->
     io:format("Cant convert this list of args: ~p~n", [Wibble]).
 
+convert_if_nec({wrapper,underscore,{attr, X, Attrs, Y}, {var,Loc,'_'}}, Next)  ->
+    NewName = list_to_atom("MU2_LOG_" ++ lists:flatten(io_lib:format("~p", [Next]))),
+    {{wrapper,variable,{attr, X, Attrs, Y}, {var,Loc,NewName}}, Next+1};
 convert_if_nec({wrapper,variable,{attr, X, Attrs, Y}, {var,Loc,Name}}, Next)  ->
     NameString = atom_to_list(Name),
     case hd(NameString) of
@@ -48,6 +51,9 @@ convert_if_nec({tree, list, Attrs, {list, Content, Last}}, Next) ->
 convert_if_nec({tree, Type, Attrs, Content}, Next) ->
     {NewContent, NewNext} = convert_args(Content, Next),
     {{tree, Type, Attrs, NewContent}, NewNext};
+convert_if_nec({wrapper, atom, Attrs, Content}, Next) ->
+    %% nothing to do to atoms...
+    {{wrapper, atom, Attrs, Content}, Next};
 convert_if_nec(Arg, Next) ->
     %% Some other type of argument - maybe an atom?
     io:format("Unhandled arg... ~p~n", [Arg]),
