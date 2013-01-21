@@ -1,4 +1,4 @@
--include("install.hrl").
+-include("include/install.hrl").
 
 -define(MUTATION_MATCH(From), fun(File) ->
 						?FULL_TD_TU([?COLLECT(?T(From),
