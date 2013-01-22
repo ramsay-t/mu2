@@ -35,7 +35,7 @@ rename_module(ST, NewName) ->
 make_file_content(File, Name, Loc, MutantName, ST) ->
     case lists:suffix(".erl", MutantName) of
 	true ->
-	    NewMName = lists:reverse(lists:nthtail(4, lists:reverse(MutantName)));
+	    NewMName = lists:reverse(lists:nthtail(4, lists:reverse(filename:basename(MutantName))));
 	false ->
 	    NewMName = MutantName
     end,
