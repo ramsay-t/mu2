@@ -1,11 +1,11 @@
 #!/bin/bash
 
-MU2_ROOT=~/Dropbox/mu2
+MU2_ROOT=/Users/ramsay/Dropbox/mu2
 
 MU2_EBIN=$MU2_ROOT/ebin
 WRANGLER_EBIN=$MU2_ROOT/../wrangler/ebin
 
-MU2_COMMAND="mu2_logging_mutations apply_logging $@"
+MU2_COMMAND="mu2_logging_mutations apply_relevant_logging $@"
 
 USAGE="Usage: apply_instrumentation <source> <output> [<function names>]"
 
