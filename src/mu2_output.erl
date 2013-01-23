@@ -1,6 +1,6 @@
 -module(mu2_output).
 
--export([write_mutant/3, make_mutant_name/2]).
+-export([write_mutant/3, make_mutant_name/2, get_module_name_from_filename/1]).
 
 -compile(export_all).
 
@@ -35,7 +35,7 @@ rename_module(ST, NewName) ->
 make_file_content(File, Name, Loc, MutantName, ST) ->
     case lists:suffix(".erl", MutantName) of
 	true ->
-	    NewMName = lists:reverse(lists:nthtail(4, lists:reverse(filename:basename(MutantName))));
+	    NewMName = get_module_name_from_filename(MutantName);
 	false ->
 	    NewMName = MutantName
     end,
@@ -45,3 +45,5 @@ make_file_content(File, Name, Loc, MutantName, ST) ->
 	"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n" ++
 	?PP(NST) ++ "\n".
     
+get_module_name_from_filename(MutantName) ->
+    lists:reverse(lists:nthtail(4, lists:reverse(filename:basename(MutantName)))).
