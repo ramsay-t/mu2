@@ -1,7 +1,10 @@
 #!/bin/bash
 
-MU2_EBIN=ebin
-WRANGLER_EBIN=../wrangler/ebin
+MU2_ROOT=/Users/ramsay/Dropbox/mu2
+
+MU2_EBIN=$MU2_ROOT/ebin
+WRANGLER_EBIN=$MU2_ROOT/../wrangler/ebin
+
 
 MU2_COMMAND="mu2_mutation mutate $1 $2 $3"
 
