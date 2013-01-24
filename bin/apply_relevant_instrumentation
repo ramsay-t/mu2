@@ -5,9 +5,9 @@ MU2_ROOT=/home/ramsay/Dropbox/mu2
 MU2_EBIN=$MU2_ROOT/ebin
 WRANGLER_EBIN=$MU2_ROOT/../wrangler/ebin
 
-MU2_COMMAND="mu2_logging_mutations apply_logging $@"
+MU2_COMMAND="mu2_logging_mutations apply_relevant_logging $@"
 
-USAGE="Usage: apply_instrumentation <source> <output> [<function names>] [-log_id <LogID>]"
+USAGE="Usage: apply_relevant_instrumentation <source> <output> [<function names>] [-log_id <LogID>]"
 
 if test -n "$1" && test -n "$2"; then
     erl -noshell -pa $MU2_EBIN -pa $WRANGLER_EBIN -s $MU2_COMMAND -s init stop
