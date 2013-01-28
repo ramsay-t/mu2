@@ -1,5 +1,5 @@
 -module(mu2_logger).
--export([start_link/2, log/3, log/4, parse_log/2, log_to_traces/1, log_to_trace_file/2]).
+-export([start_link/2, log/3, log/4, parse_log/2, log_to_traces/1, log_to_trace_file/2, logfile_to_tracefile/1, logfile_to_statechum/1]).
 
 -export([init/1, handle_call/3, handle_cast/2]).
 
@@ -74,6 +74,27 @@ log_to_trace_file([Trace | Ts], File) ->
     file:write_file(File, Msg, [append]),
     log_to_trace_file(Ts, File).
 
+log_to_statechumfile([], _File) ->
+    ok;
+log_to_statechumfile([[] | Ts], File) ->
+    log_to_statechumfile(Ts, File);
+log_to_statechumfile([Trace |Ts], File) ->
+    Msg = io_lib:format("+ [[~s]]~n", [trace_to_statechum_string(Trace)]),
+    file:write_file(File, Msg, [append]),
+    log_to_statechumfile(Ts, File).
+
+logfile_to_tracefile([FileNameAtom, Module]) ->
+    FileName = atom_to_list(FileNameAtom),
+    TraceName = re:replace(FileName, ".log", ".traces", [{return,list}]),
+    Log = parse_log(FileName, Module),
+    log_to_trace_file(Log, TraceName).
+
+logfile_to_statechum([FileNameAtom, Module]) ->
+    FileName = atom_to_list(FileNameAtom),
+    TraceName = re:replace(FileName, ".log", ".traces", [{return,list}]),
+    Log = parse_log(FileName, Module),
+    log_to_statechumfile(Log, TraceName).
+
 log_to_traces([]) ->
     [];
 log_to_traces([Trace | Ts]) ->
@@ -83,4 +104,9 @@ trace_to_string([]) ->
     "";
 trace_to_string([{M,F,A} | Ts]) ->
     lists:flatten(io_lib:format("~900000000p ", [{M,F,A}]) ++ trace_to_string(Ts)).
+
+trace_to_statechum_string([]) ->
+    "";
+trace_to_statechum_string([{M,F,A} | Ts]) ->
+    lists:flatten(io_lib:format("~900000000p,", [{M,F,A}]) ++ trace_to_statechum_string(Ts)).
 
