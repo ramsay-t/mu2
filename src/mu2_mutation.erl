@@ -57,6 +57,7 @@ possible_mutations(_File, []) ->
     [];
 possible_mutations(File, [{Name, Match, Mutation} | Ms]) ->
     io:format("Checking applicability of ~p, ~p more to try...~n", [Name, length(Ms)]),
-    lists:map(fun({_File, Loc}) -> {{Name, Match, Mutation}, Loc} end, erlang:apply(Match, [File])) 
+%% FIXME this concatenation is probably why its getting progressivly slower...?
+    lists:map(fun({_File, Loc}) -> {{Name, Match, Mutation}, Loc} end, erlang:apply(Match, [File]))
 	++ possible_mutations(File, Ms).
 

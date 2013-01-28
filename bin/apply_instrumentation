@@ -1,6 +1,6 @@
 #!/bin/bash
 
-MU2_ROOT=/home/ramsay/Dropbox/mu2
+MU2_ROOT=/Users/ramsay/Dropbox/mu2
 
 MU2_EBIN=$MU2_ROOT/ebin
 WRANGLER_EBIN=$MU2_ROOT/../wrangler/ebin
