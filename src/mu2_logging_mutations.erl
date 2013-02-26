@@ -7,7 +7,10 @@ log_mutation(File, LogID) ->
     ?FULL_TD_TP([?RULE(?T("f@(Args@@) when Guard@@-> Body@@;"), 
 		       begin
 			   {NewArgs@@, LogArgs@@, _} = convert_args(Args@@, 1),
-			   ?TO_AST("f@(NewArgs@@) when Guard@@-> mu2_logger:log(?MODULE, f@, [LogArgs@@], " ++ LogID ++ "), Body@@;")
+			   %%ArgNames@@ = lists:map(fun(A) -> io_lib:format("\"~w\",", [?PP(A)]) end, NewArgs@@),
+			   ArgNames@@ = lists:flatten("\"" ++ re:replace(?PP(LogArgs@@), ",", "\",\"", [{return,list},global]) ++ "\""),
+			   %%io:format("Arg Names::::: ~p~n", [ArgNames@@]),
+			   ?TO_AST("f@(NewArgs@@) when Guard@@-> MU2_RESULT = begin Body@@ end, mu2_logger:log(?MODULE, f@, [LogArgs@@], [" ++ ArgNames@@ ++ "], MU2_RESULT, " ++ LogID ++ "), MU2_RESULT;")
 		       end,
 		       true)], 
 		[File]).
@@ -16,7 +19,9 @@ specific_log_mutation(File, FunctionNames, LogID) ->
     ?FULL_TD_TP([?RULE(?T("f@(Args@@) when Guard@@-> Body@@;"), 
 		       begin
 			   {NewArgs@@, LogArgs@@, _} = convert_args(Args@@, 1),
-			   ?TO_AST("f@(NewArgs@@) when Guard@@-> mu2_logger:log(?MODULE, f@, [LogArgs@@], " ++ LogID ++ "), Body@@;")
+			   ArgNames@@ = lists:flatten("\"" ++ re:replace(?PP(LogArgs@@), ",", "\",\"", [{return,list},global]) ++ "\""),
+			   %%?TO_AST("f@(NewArgs@@) when Guard@@-> mu2_logger:log(?MODULE, f@, [LogArgs@@], [" ++ ArgNames@@ ++ "], " ++ LogID ++ "), Body@@;")
+			   ?TO_AST("f@(NewArgs@@) when Guard@@-> MU2_RESULT = begin Body@@ end, mu2_logger:log(?MODULE, f@, [LogArgs@@], [" ++ ArgNames@@ ++ "], MU2_RESULT, " ++ LogID ++ "), MU2_RESULT;")			   
 		       end,
 		       contains(FunctionNames, {list_to_atom(?PP(f@)), length(Args@@)}))], 
 		[File]).

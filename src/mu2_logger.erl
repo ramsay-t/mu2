@@ -1,5 +1,5 @@
 -module(mu2_logger).
--export([start_link/2, log/3, log/4, parse_log/2, log_to_traces/1, log_to_trace_file/2, logfile_to_tracefile/1, logfile_to_statechum/1]).
+-export([start_link/2, log/5, log/6, parse_log/2, log_to_traces/1, log_to_trace_file/2, logfile_to_tracefile/1, logfile_to_statechum/1, logfile_to_efsmfile/1]).
 
 -export([init/1, handle_call/3, handle_cast/2]).
 
@@ -12,21 +12,24 @@ init(Filename) ->
     {ok, Filename}.
 
 log_to_file(File, Data) ->
-    Msg = io_lib:format("~w.~n", [Data]),
+    Msg = io_lib:format("~p.~n", [Data]),
     %% Convert PIDs and Refs to strings...
     MidMsg = re:replace(Msg, "<[^>]*>", "\"&\"", [{return,list},global]),
     ProcMsg = re:replace(MidMsg, "#Ref\"", "\"Ref", [{return,list},global]),
-    file:write_file(File, ProcMsg, [append]).
+    ProcProcMsg = re:replace(ProcMsg, "#Fun\"", "\"Fun", [{return,list},global]),
+    file:write_file(File, ProcProcMsg, [append]).
 
-handle_call({F,A}, _From, File) ->
-    log_to_file(File, {F,A}),
+handle_call({F,A,Result,Ns}, _From, File) ->
+    FName = lists:flatten(io_lib:format("~p/~p", [F, length(A)])),
+    log_to_file(File, {FName,A,Result,Ns}),
     {noreply, File};
 handle_call(stop, _From, File) ->
     %%close_file(File),
     {stop,normal,File}.
 
-handle_cast({M,F,A}, File) ->
-    log_to_file(File, {M,F,A}),
+handle_cast({M,F,A,Result,Ns}, File) ->
+    FName = lists:flatten(io_lib:format("~p/~p", [F, length(A)])),
+    log_to_file(File, {M,FName,A,Result,Ns}),
     {noreply, File};
 handle_cast(stop, File) ->
     %%close_file(File),
@@ -35,10 +38,10 @@ handle_cast(stop, File) ->
 make_name(LogID) ->
     list_to_atom(atom_to_list(LogID) ++ "_logger").
 
-log(M, F, A) ->
-    log(M, F, A, M).
+log(M, F, A, Result, Ns) ->
+    log(M, F, A, Ns, Result, M).
 
-log(M, F, A, LogID) ->
+log(M, F, A, Ns, Result, LogID) ->
     Name = make_name(LogID),
     case whereis(Name) of
 	undefined ->
@@ -47,7 +50,23 @@ log(M, F, A, LogID) ->
 	_ ->
 	    ok
     end,
-    gen_server:cast(Name, {M,F,A}).
+    NPairs = case Ns of 
+		 [[]] ->
+		     [{"Result", get_type(Result)}];
+		 _ ->
+		     %%erlang:exit(lists:flatten(io_lib:format("Zipping >>>>>>> ~p <<<<<<<<< and >>>>>>>>>>> ~p <<<<<<<<< ((((((((~p))))))))", [Ns ++ ["Result"], A ++ [Result], Result]))),
+		     lists:zip(Ns ++ ["Result"],lists:map(fun(Arg) -> get_type(Arg) end, A ++ [Result]))
+	     end,
+    gen_server:cast(Name, {M,F,A,Result,NPairs}).
+
+get_type(A) ->
+    AString = lists:flatten(io_lib:format("~p", [A])),
+    case re:replace(AString, "[0-9.]*", "", [{return,list}]) of
+	[] ->
+	    "N";
+	_ ->
+	    "S"
+    end.
 
 parse_log(File, Module) ->
     {ok, Content} = file:consult(File),
@@ -55,10 +74,10 @@ parse_log(File, Module) ->
 
 split_for_module(_Module, []) ->
     [[]];
-split_for_module(Module, [{Module, F, A}| More]) ->
+split_for_module(Module, [{Module, F, A, Result, Ns}| More]) ->
     Sub = split_for_module(Module, More),
-    [[{Module,F,A} | hd(Sub)] | tl(Sub)];
-split_for_module(Module, [{_NotModule, _F, _A} | More]) ->
+    [[{Module,F,A,Result,Ns} | hd(Sub)] | tl(Sub)];
+split_for_module(Module, [{_NotModule, _F, _A, _Result, _Ns} | More]) ->
     Sub = split_for_module(Module, More),
     case hd(Sub) of
 	[] ->
@@ -66,22 +85,6 @@ split_for_module(Module, [{_NotModule, _F, _A} | More]) ->
 	_List ->
 	    [[] | Sub]	
     end.
-
-log_to_trace_file([], _File) ->
-    ok;
-log_to_trace_file([Trace | Ts], File) ->
-    Msg = io_lib:format("+ ~s~n", [trace_to_string(Trace)]),
-    file:write_file(File, Msg, [append]),
-    log_to_trace_file(Ts, File).
-
-log_to_statechumfile([], _File) ->
-    ok;
-log_to_statechumfile([[] | Ts], File) ->
-    log_to_statechumfile(Ts, File);
-log_to_statechumfile([Trace |Ts], File) ->
-    Msg = io_lib:format("+ [[~s]]~n", [trace_to_statechum_string(Trace)]),
-    file:write_file(File, Msg, [append]),
-    log_to_statechumfile(Ts, File).
 
 logfile_to_tracefile([FileNameAtom, Module]) ->
     FileName = atom_to_list(FileNameAtom),
@@ -95,18 +98,94 @@ logfile_to_statechum([FileNameAtom, Module]) ->
     Log = parse_log(FileName, Module),
     log_to_statechumfile(Log, TraceName).
 
+logfile_to_efsmfile([FileNameAtom, Module]) ->
+    FileName = atom_to_list(FileNameAtom),
+    TraceName = re:replace(FileName, ".log", ".traces", [{return,list}]),
+    Log = parse_log(FileName, Module),
+    Types = get_efsm_names(Log),
+    Msg = io_lib:format("types~n~s~n", [Types]),
+    file:write_file(TraceName, Msg, [append]),
+    log_to_efsmfile(Log, TraceName).
+    
+log_to_trace_file([], _File) ->
+    ok;
+log_to_trace_file([Trace | Ts], File) ->
+    Rev = init:get_argument(rev),
+    T = if Rev == error ->
+		Trace;
+	   true ->
+		lists:reverse(Trace)
+	end,
+    Msg = io_lib:format("+ ~s~n", [trace_to_string(T)]),
+    file:write_file(File, Msg, [append]),
+    log_to_trace_file(Ts, File).
+
+log_to_statechumfile([], _File) ->
+    ok;
+log_to_statechumfile([[] | Ts], File) ->
+    log_to_statechumfile(Ts, File);
+log_to_statechumfile([Trace |Ts], File) ->
+    Rev = init:get_argument(rev),
+    T = if Rev == error ->
+		Trace;
+	   true ->
+		lists:reverse(Trace)
+	end,
+    Msg = io_lib:format("+[[~s]]~n", [trace_to_statechum_string(T)]),
+    file:write_file(File, Msg, [append]),
+    log_to_statechumfile(Ts, File).
+
+log_to_efsmfile([], _File) ->
+    ok;
+log_to_efsmfile([Trace | Ts], File) ->
+    Rev = init:get_argument(rev),
+    T = if Rev == error ->
+		Trace;
+	   true ->
+		lists:reverse(Trace)
+	end,
+    Msg = io_lib:format("trace~n~s~n", [trace_to_efsm(T)]),
+    file:write_file(File, Msg, [append]),
+    log_to_efsmfile(Ts, File).
+
+
 log_to_traces([]) ->
     [];
 log_to_traces([Trace | Ts]) ->
     [io_lib:format("+ ~s", [trace_to_string(Trace)]) | log_to_traces(Ts)].
 
+trace_to_efsm([]) ->
+    "";
+trace_to_efsm([{_M, F, A, Result, _Names} | Ts]) ->
+    lists:flatten(io_lib:format("~p ~s~n", [F, make_efsm_args(A ++ [Result])]) ++ trace_to_efsm(Ts)).
+
+make_efsm_args([]) ->
+    "";
+make_efsm_args([A | As]) ->
+    lists:flatten(io_lib:format("~900000000p ", [A]) ++ make_efsm_args(As)).
+
 trace_to_string([]) ->
     "";
-trace_to_string([{M,F,A} | Ts]) ->
-    lists:flatten(io_lib:format("~900000000p ", [{M,F,A}]) ++ trace_to_string(Ts)).
+trace_to_string([{M,F,A,Result,_Names} | Ts]) ->
+    lists:flatten(io_lib:format("~900000000p ", [{M,F,A,Result}]) ++ trace_to_string(Ts)).
 
 trace_to_statechum_string([]) ->
     "";
-trace_to_statechum_string([{M,F,A} | Ts]) ->
-    lists:flatten(io_lib:format("~900000000p,", [{M,F,A}]) ++ trace_to_statechum_string(Ts)).
+trace_to_statechum_string([{M,F,A,Result,_Names} | Ts]) ->
+    lists:flatten(io_lib:format("~900000000p,", [{M,F,A,Result}]) ++ trace_to_statechum_string(Ts)).
 
+get_efsm_names(Traces) ->
+    TypeSet = lists:foldl(fun({_M,F,_A,_Result,Ns}, S) -> 
+				  case lists:keyfind(F,1,S) of
+				      false ->
+					  [{F, io_lib:format("~s", [make_type_string(Ns)])} | S];
+				      _ ->
+					  S
+				  end
+			  end, [], lists:flatten(Traces)),
+    lists:flatten(lists:map(fun({F,Ts}) -> io_lib:format("~p ~s~n", [F,Ts]) end, TypeSet)).
+
+make_type_string([]) ->
+    "";
+make_type_string([{N,T} | Ns]) ->
+    lists:flatten(io_lib:format("~p:~s ", [N,T])) ++ make_type_string(Ns).
