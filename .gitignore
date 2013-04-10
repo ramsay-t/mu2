@@ -13,3 +13,5 @@ locker_mut.erl
 test_mut.log
 
 *.erl#
+
+.DS_Store
