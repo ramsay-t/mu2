@@ -16,7 +16,7 @@ case_mutations() ->
 		    NewPats@@@ = swap(Pats@@@, A, B),
 		    NewGuards@@@ = swap(Guards@@@, A, B),
 		    NewBody@@@ = swap(Body@@@, A, B),
-		    ?TO_AST("case Expr@ of NewPats@@@ when NewGuards@@@-> NewBody@@@ end")
+		    ?TO_AST("case Expr@ of NewPats@@@ when NewGuards@@@ -> NewBody@@@ end")
 		end)},
      {exchange_case_guard,?MUTATION_MATCH("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end"),
       ?MUTATION("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end",
@@ -42,7 +42,7 @@ case_mutations() ->
 		    NewBody@@@ = lists:sublist(Body@@@, length(Pats@@@) -1),
 		    ?TO_AST("case Expr@ of NewPats@@@ when NewGuards@@@-> NewBody@@@ end")
 		end)}
-].
+    ].
 
 
 random_not_n(Range, Not) ->

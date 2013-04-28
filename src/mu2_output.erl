@@ -30,8 +30,8 @@ rename_module(ST, NewName) ->
     ?FULL_TD_TP([?RULE(?T("-module(name@)"), 
 		       ?TO_AST("-module(" ++ NewName ++ ")"),
 		       true)], 
-		[ST]).
-
+		ST).
+   %%          [ST]).
 make_file_content(File, Name, Loc, MutantName, ST) ->
     case lists:suffix(".erl", MutantName) of
 	true ->
@@ -43,7 +43,8 @@ make_file_content(File, Name, Loc, MutantName, ST) ->
     "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n" ++
 	lists:flatten(io_lib:format("%% Generated from ~p~n%% Applied rule ~p at location ~p~n", [File, Name, Loc])) ++
 	"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n" ++
-	?PP(NST) ++ "\n".
+    wrangler_prettypr:print_ast('unix',NST) ++ "\n".
+%%     ?PP(NST) ++ "\n".
     
 get_module_name_from_filename(MutantName) ->
     lists:reverse(lists:nthtail(4, lists:reverse(filename:basename(MutantName)))).
