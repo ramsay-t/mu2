@@ -55,6 +55,7 @@ log(M, F, A, Ns, Result, LogID) ->
 		 [[]] ->
 		     [{"Result", get_type(Result)}];
 		 _ ->
+		     %%erlang:exit(lists:flatten(io_lib:format("Zipping >>>>>>> ~p <<<<<<<<< and >>>>>>>>>>> ~p <<<<<<<<< ((((((((~p))))))))", [Ns ++ ["Result"], A ++ [Result], Result]))),
 		     lists:zip(Ns ++ ["Result"],lists:map(fun(Arg) -> get_type(Arg) end, A ++ [Result]))
 	     end,
     gen_server:cast(Name, {M,F,A,Result,NPairs}).
@@ -162,7 +163,6 @@ strip_handlers(F,A) ->
 	_ ->
 	    {Fs,A}
     end.
-
 
 log_to_traces([]) ->
     [];
