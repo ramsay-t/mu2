@@ -8,16 +8,16 @@ all() ->
     [].
 %%    atom_mutations() ++ tuple_mutations().
 
-atom_mutations() ->
-    [{fun_atom2var, ?MUTATION_MATCH("f@(Args@@) when Guard@@ -> Body@@."), 
-      ?MUTATION("function@(Args@@) when Guard@@ -> Body@@.", 
-		begin
-		    Arg = random:uniform(length(Args@@)),
-		    %% Fixme change one...
-		    NewArgs@@ = Args@@,
-		    ?TO_AST("f@(NewArgs@@) when Guard@@ -> Body@@.")
-		end)}
-    ].
+%% atom_mutations() ->
+%%     [{fun_atom2var, ?MUTATION_MATCH("f@(Args@@) when Guard@@ -> Body@@."), 
+%%       ?MUTATION("function@(Args@@) when Guard@@ -> Body@@.", 
+%% 		begin
+%% 		    Arg = random:uniform(length(Args@@)),
+%% 		    %% Fixme change one...
+%% 		    NewArgs@@ = Args@@,
+%% 		    ?TO_AST("f@(NewArgs@@) when Guard@@ -> Body@@.")
+%% 		end)}
+%%     ].
 
 
 
@@ -30,5 +30,5 @@ atom_mutations() ->
 %%		    end,
 
 
-tuple_mutations() ->
-    [].
+%% tuple_mutations() ->
+%%     [].

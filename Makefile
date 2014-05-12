@@ -1,20 +1,26 @@
-WRANGLER_ROOT=../wrangler
-LIBS=-pa $(WRANGLER_ROOT)/ebin
-SOURCES=$(wildcard src/*.erl)
-SED=sed
+all: compile $(WRANGLER_ROOT) $(OBJS)
 
-default: all
-	for x in bin/*; do $(SED) -i.tmp 's|MU2_ROOT=.*|MU2_ROOT=$(CURDIR)|' $$x; done
-	rm bin/*.tmp
-	$(SED) -i.tmp 's|-include(".*wrangler/include/wrangler.hrl")\.|-include("$(WRANGLER_ROOT)/include/wrangler.hrl")\.|' include/install.hrl
-	rm include/*.tmp
+compile: deps
+	./rebar compile
 
-ebin/%.beam: src/%.erl
-	erlc -o ebin $(LIBS) $<
+deps:
+	./rebar get-deps
+
+doc:
+	./rebar skip_deps=true doc
+
+xref:
+	./rebar skip_deps=true xref
 
 clean:
-	rm ebin/*
+	./rebar clean
 
-all: $(patsubst src/%.erl,ebin/%.beam,$(SOURCES))
+test:
+	./rebar skip_deps=true eunit
+
+escriptize: compile
+	./rebar escriptize
+
+.PHONY: test
 
 

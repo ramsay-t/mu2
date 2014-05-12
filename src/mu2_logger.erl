@@ -1,7 +1,7 @@
 -module(mu2_logger).
 -export([start_link/2, log/5, log/6, parse_log/2, log_to_traces/1, log_to_trace_file/2, logfile_to_tracefile/1, logfile_to_statechum/1, logfile_to_efsmfile/1]).
 
--export([init/1, handle_call/3, handle_cast/2]).
+-export([init/1,handle_call/2,handle_cast/2,terminate/2,handle_call/3,code_change/3,handle_info/2]).
 
 -behaviour(gen_server).
 
@@ -20,13 +20,16 @@ log_to_file(File, Data) ->
     ProcProcMsg = re:replace(ProcMsg, "#Fun\"", "\"Fun", [{return,list},global]),
     file:write_file(File, ProcProcMsg, [append]).
 
-handle_call({F,A,Result,Ns}, _From, File) ->
+handle_call({F,A,Result,Ns}, File) ->
     FName = lists:flatten(io_lib:format("~p/~p", [F, length(A)])),
     log_to_file(File, {FName,A,Result,Ns}),
     {noreply, File};
-handle_call(stop, _From, File) ->
+handle_call(stop, File) ->
     %%close_file(File),
     {stop,normal,File}.
+
+handle_call(Call,_From,File) ->
+    handle_call(Call,File).
 
 handle_cast({M,F,A,Result,Ns}, File) ->
     FName = lists:flatten(io_lib:format("~p/~p", [F, length(A)])),
@@ -211,3 +214,19 @@ make_type_string([]) ->
     "";
 make_type_string([{N,T} | Ns]) ->
     lists:flatten(io_lib:format("~p:~s ", [N,T])) ++ make_type_string(Ns).
+
+%% @private
+terminate(normal,_State) ->
+    ok;
+terminate(_,_State) ->
+    ok.
+
+%% @private
+handle_info(Info,State) ->
+    io:format("Mu2 logging server recieved information: ~p~n",[Info]),
+    {noreply,State}.
+
+%% @private
+code_change(_OldVsn,State,_Extra) ->
+    {ok,State}.
+
