@@ -5,7 +5,7 @@ MU2_ROOT=/Users/ramsay/Dropbox/mu2
 MU2_EBIN=$MU2_ROOT/ebin
 WRANGLER_EBIN=$MU2_ROOT/../wrangler/ebin
 
-MU2_COMMAND="mu2_logger logfile_to_tracefile $@"
+MU2_COMMAND="mu2_logger logfile_to_efsmfile $@"
 
 USAGE="Usage: make_trace_file <logfile> <module>"
 
