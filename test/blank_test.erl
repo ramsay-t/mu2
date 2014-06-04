@@ -3,4 +3,4 @@
 -include_lib("eunit/include/eunit.hrl").
 
 fake_test() ->
-    ok.
+    ?assert(true).

@@ -1,12 +1,7 @@
 -module(mu2_mutation).
--export([generate_mutants/4, random_mutation/2, all_mutations/0, generate_mutants/1, test/1, mutate/1]).
+-export([generate_mutants/4, random_mutation/2, all_mutations/0, generate_mutants/1, mutate/1]).
 
 -include("../include/mutations.hrl").
-
-test(File) ->
-    io:format("GOT: ~p~n", [File]),
-    generate_mutants(File, all_mutations(), 1000, "mutants/").
-%    generate_mutants(File, mu2_datatype_mutations:all(), 1000, "mutants/").
 
 all_mutations() ->
     mu2_exchange_mutations:all() ++ mu2_case_mutations:all() ++ mu2_if_mutations:all() ++ mu2_datatype_mutations:all().
