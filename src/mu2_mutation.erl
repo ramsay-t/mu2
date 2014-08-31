@@ -4,7 +4,7 @@
 -include("../include/mutations.hrl").
 
 all_mutations() ->
-    mu2_exchange_mutations:all() ++ mu2_case_mutations:all() ++ mu2_if_mutations:all() ++ mu2_datatype_mutations:all().
+    mu2_exchange_mutations:all() ++ mu2_case_mutations:all() ++ mu2_if_mutations:all() ++ mu2_datatype_mutations:all() ++ mu2_receive_mutations:all().
 
 %% This is for use on the command line via -s 
 mutate([File, OutputFolder, CountString]) ->

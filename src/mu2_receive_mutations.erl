@@ -51,19 +51,20 @@ receive_mutations() ->
     		    NewGuards@@@ = lists:sublist(Guards@@@, length(Pats@@@) -1),
     		    NewBody@@@ = lists:sublist(Body@@@, length(Pats@@@) -1),
 		    ?TO_AST("receive NewPats@@@ when NewGuards@@@ -> NewBody@@@ end")
-    		end)},
-    {increase_timeout,
-      ?MUTATION_RESTRICT("receive Pats@@@ when Guards@@@ -> Body@@@ after APats@@@ -> ABody@@@ end",
-			 begin
-			     io:format("got Timeout: ~p~n",[APats@@@]),
-			     length(APats@@@) > 0
-			 end),
-      ?MUTATION("receive Pats@@@ when Guards@@@ -> Body@@@ after APats@@@ -> ABody@@@ end",
-    		begin
-    		    NewPats@@@ = lists:sublist(Pats@@@, length(Pats@@@) -1),
-    		    NewGuards@@@ = lists:sublist(Guards@@@, length(Pats@@@) -1),
-    		    NewBody@@@ = lists:sublist(Body@@@, length(Pats@@@) -1),
-		    ?TO_AST("receive NewPats@@@ when NewGuards@@@ -> NewBody@@@ end")
     		end)}
+%% ,
+%%     {increase_timeout,
+%%       ?MUTATION_RESTRICT("receive Pats@@@ when Guards@@@ -> Body@@@ after APats@@@ -> ABody@@@ end",
+%% 			 begin
+%% 			     io:format("got Timeout: ~p~n",[APats@@@]),
+%% 			     length(APats@@@) > 0
+%% 			 end),
+%%       ?MUTATION("receive Pats@@@ when Guards@@@ -> Body@@@ after APats@@@ -> ABody@@@ end",
+%%     		begin
+%%     		    NewPats@@@ = lists:sublist(Pats@@@, length(Pats@@@) -1),
+%%     		    NewGuards@@@ = lists:sublist(Guards@@@, length(Pats@@@) -1),
+%%     		    NewBody@@@ = lists:sublist(Body@@@, length(Pats@@@) -1),
+%% 		    ?TO_AST("receive NewPats@@@ when NewGuards@@@ -> NewBody@@@ end")
+%%     		end)}
     ].
 

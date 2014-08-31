@@ -51,12 +51,12 @@ case_mutations() ->
 		    NewGuards@@@ = lists:sublist(Guards@@@, length(Pats@@@) -1),
 		    NewBody@@@ = lists:sublist(Body@@@, length(Pats@@@) -1),
 		    
-		    mu2_extras_server:add(?MUTATION("case NExpr@ of NPats@@@ when NGuards@@@ -> NBody@@@ end",
-						    begin
-							%% Put everything back...
-							?TO_AST("case Expr@ of Pats@@@ when Guards@@@-> Body@@@ end")
-						    end
-						   )),
+		    %% mu2_extras_server:add(?MUTATION("case NExpr@ of NPats@@@ when NGuards@@@ -> NBody@@@ end",
+		    %% 				    begin
+		    %% 					%% Put everything back...
+		    %% 					?TO_AST("case Expr@ of Pats@@@ when Guards@@@-> Body@@@ end")
+		    %% 				    end
+		    %% 				   )),
 
 		    ?TO_AST("case Expr@ of NewPats@@@ when NewGuards@@@-> NewBody@@@ end")
 		end)}
