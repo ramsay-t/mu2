@@ -4,11 +4,15 @@
 
 -include("../include/mutations.hrl").
 
+-compile(nowarn_shadow_vars).
+
 all() ->
     case_mutations().
 
 case_mutations() ->
-    [{swap_case_order,?MUTATION_MATCH("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end"),
+    [{swap_case_order,
+      ?MUTATION_RESTRICT("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end",
+			 length(Pats@@@) > 1),
       ?MUTATION("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end",
 		begin
 		    A = random:uniform(length(Pats@@@)),
@@ -18,7 +22,9 @@ case_mutations() ->
 		    NewBody@@@ = swap(Body@@@, A, B),
 		    ?TO_AST("case Expr@ of NewPats@@@ when NewGuards@@@ -> NewBody@@@ end")
 		end)},
-     {exchange_case_guard,?MUTATION_MATCH("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end"),
+     {exchange_case_guard,
+      ?MUTATION_RESTRICT("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end",
+			 length(Pats@@@) > 1),
       ?MUTATION("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end",
 		begin
 		    A = random:uniform(length(Pats@@@)),
@@ -26,7 +32,9 @@ case_mutations() ->
 		    NewGuards@@@ = swap(Guards@@@, A, B),
 		    ?TO_AST("case Expr@ of Pats@@@ when NewGuards@@@-> Body@@@ end")
 		end)},
-     {exchange_case_pattern,?MUTATION_MATCH("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end"),
+     {exchange_case_pattern,
+      ?MUTATION_RESTRICT("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end",
+			 length(Pats@@@) > 1),
       ?MUTATION("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end",
 		begin
 		    A = random:uniform(length(Pats@@@)),
@@ -34,17 +42,28 @@ case_mutations() ->
 		    NewPats@@@ = swap(Pats@@@, A, B),
 		    ?TO_AST("case Expr@ of NewPats@@@ when Guards@@@-> Body@@@ end")
 		end)},
-     {remove_last_case,?MUTATION_MATCH("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end"),
+     {remove_last_case,
+      ?MUTATION_RESTRICT("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end",
+			 length(Pats@@@) > 1),
       ?MUTATION("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end",
 		begin
 		    NewPats@@@ = lists:sublist(Pats@@@, length(Pats@@@) -1),
 		    NewGuards@@@ = lists:sublist(Guards@@@, length(Pats@@@) -1),
 		    NewBody@@@ = lists:sublist(Body@@@, length(Pats@@@) -1),
+		    
+		    mu2_extras_server:add(?MUTATION("case NExpr@ of NPats@@@ when NGuards@@@ -> NBody@@@ end",
+						    begin
+							%% Put everything back...
+							?TO_AST("case Expr@ of Pats@@@ when Guards@@@-> Body@@@ end")
+						    end
+						   )),
+
 		    ?TO_AST("case Expr@ of NewPats@@@ when NewGuards@@@-> NewBody@@@ end")
 		end)}
     ].
 
-
+random_not_n(1,1) ->
+    exit("Called for a random number between 1 and 1 thats not 1...");
 random_not_n(Range, Not) ->
     case random:uniform(Range) of
 	Not ->

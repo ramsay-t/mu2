@@ -12,8 +12,8 @@ generate(File,Mutations,Number,OutputFolder) ->
 
 test(Module,MutantFolder,TestFun) ->
     %% List the mutants
-    Ms = file:list_dir(MutantFolder),
-    lists:map(fun(M) -> one_test(Module, M, TestFun) end, Ms).
+    {ok, Ms} = file:list_dir(MutantFolder),
+    lists:map(fun(M) -> one_test(Module, filename:join(MutantFolder,M), TestFun) end, Ms).
 
 one_test(Module,MutantFile,TestFun) ->
     %% Rename the mutant

@@ -24,12 +24,22 @@ generate_mutants(File, Mutations, Number, OutputFolder) ->
 generate_mutants([File, Mutations, Number, OutputFolder]) ->
     generate_mutants(File, Mutations, Number, OutputFolder).
 
+apply_extras(AST, File, Loc) ->
+    case mu2_extras_server:pop_first() of
+	{error, no_mutations} -> 
+	    AST;
+	Mutation ->
+	   {ok, [{{File, File}, NewAST}]} = erlang:apply(Mutation, [File, Loc]),
+	    apply_extras(NewAST, File, Loc)
+	end.
+
 random_mutation(File, PosMuts) ->
     Item = random:uniform(length(PosMuts)),
     {{Name, _Match, Mutation}, Loc} = lists:nth(Item, PosMuts),
     io:format("Applying ~p at ~p...~n", [Name, Loc]),
     {ok, [{{File, File}, ST}]} = erlang:apply(Mutation, [File, Loc]),
-    {File, Name, Item, Loc, ST}.
+    AST = apply_extras(ST, File, Loc),
+    {File, Name, Item, Loc, AST}.
 
 %% Internal functions ----------------------------
 
@@ -41,18 +51,20 @@ more_mutants(_File, _PosMuts, Number, _OutputFolder) when (Number == 0) ->
     [];
 more_mutants(File, PosMuts, Number, OutputFolder) ->
     {File, Name, Item, Loc, ST} = random_mutation(File, PosMuts),
-    MutantName = mu2_output:make_mutant_name(File, Number),
+    MutantName = mu2_output:make_mutant_name(File, Name, Loc),
     mu2_output:write_mutant(OutputFolder, MutantName, {File, Name, Item, Loc, ST}),
     {Pre, Post} = lists:split(Item, PosMuts),
     OtherPosMuts = lists:sublist(Pre, Item-1) ++ Post,
     io:format("Choosing ~p more mutants from ~p possiblities...~n", [Number-1, length(OtherPosMuts)]),
     [{MutantName, Name, Loc} | more_mutants(File, OtherPosMuts, Number-1, OutputFolder)].
 
-possible_mutations(_File, []) ->
-    [];
-possible_mutations(File, [{Name, Match, Mutation} | Ms]) ->
+possible_mutations(File, Ms) ->
+    possible_mutations(File, Ms, []).
+
+possible_mutations(_File, [], Res) ->
+    lists:flatten(Res);
+possible_mutations(File, [{Name, Match, Mutation} | Ms], Res) ->
     io:format("Checking applicability of ~p, ~p more to try...~n", [Name, length(Ms)]),
-%% FIXME this concatenation is probably why its getting progressivly slower...?
-    lists:map(fun({_File, Loc}) -> {{Name, Match, Mutation}, Loc} end, erlang:apply(Match, [File]))
-	++ possible_mutations(File, Ms).
+    NewRes = [lists:map(fun({_File, Loc}) -> {{Name, Match, Mutation}, Loc} end, erlang:apply(Match, [File])) | Res],
+    possible_mutations(File, Ms, NewRes).
 
