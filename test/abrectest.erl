@@ -5,7 +5,7 @@ dv(A,B) ->
     PID = spawn(?MODULE,dv_proc,[]),
     PID ! {self(), {A,B}},
     receive Msg ->
-	    Msg;
+	    Msg
     after 5000 ->
 	    failed
     end.
