@@ -35,8 +35,7 @@ arithmetic() ->
      ,{rem_to_div, ?MUTATION_MATCH("X@ rem Y@"), ?MUTATION_EXCHANGE("X@ rem Y@", "X@ / Y@")}
     ].
 
-%% {'and', 'or', 'xor'}
-%% Not is excluded from the exchanges since it is not binary
+%% {'and', 'or', 'xor', 'true', 'false'}
 logic() ->
     [{and_to_or, ?MUTATION_MATCH("X@ and Y@"), ?MUTATION_EXCHANGE("X@ and Y@", "X@ or Y@")}
      ,{and_to_xor, ?MUTATION_MATCH("X@ and Y@"), ?MUTATION_EXCHANGE("X@ and Y@", "X@ xor Y@")}
@@ -46,6 +45,11 @@ logic() ->
 
      ,{xor_to_and, ?MUTATION_MATCH("X@ xor Y@"), ?MUTATION_EXCHANGE("X@ xor Y@", "X@ and Y@")}
      ,{xor_to_or, ?MUTATION_MATCH("X@ xor Y@"), ?MUTATION_EXCHANGE("X@ xor Y@", "X@ or Y@")}
+
+     ,{true_to_false, ?MUTATION_MATCH("true"), ?MUTATION_EXCHANGE("true", "false")}
+     ,{false_to_true, ?MUTATION_MATCH("false"), ?MUTATION_EXCHANGE("false", "true")}
+
+     ,{remove_negation, ?MUTATION_MATCH("not F@"), ?MUTATION_EXCHANGE("not F@", "F@")}
     ].
 
 %% {'<', '==', '>', '>=', '=<', '/=', '=:=', '=/='}

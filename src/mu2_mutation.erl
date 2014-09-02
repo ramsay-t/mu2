@@ -24,22 +24,23 @@ generate_mutants(File, Mutations, Number, OutputFolder) ->
 generate_mutants([File, Mutations, Number, OutputFolder]) ->
     generate_mutants(File, Mutations, Number, OutputFolder).
 
-apply_extras(AST, File, Loc) ->
+apply_extras(AST, Loc) ->
     case mu2_extras_server:pop_first() of
 	{error, no_mutations} -> 
 	    AST;
 	Mutation ->
-	   {ok, [{{File, File}, NewAST}]} = erlang:apply(Mutation, [File, Loc]),
-	    apply_extras(NewAST, File, Loc)
+	    {ok, NewAST} = erlang:apply(Mutation, [AST, Loc]),
+	    apply_extras(NewAST, Loc)
 	end.
 
 random_mutation(File, PosMuts) ->
     Item = random:uniform(length(PosMuts)),
     {{Name, _Match, Mutation}, Loc} = lists:nth(Item, PosMuts),
+    {ok, AST} = api_refac:get_ast(File),
     io:format("Applying ~p at ~p...~n", [Name, Loc]),
-    {ok, [{{File, File}, ST}]} = erlang:apply(Mutation, [File, Loc]),
-    AST = apply_extras(ST, File, Loc),
-    {File, Name, Item, Loc, AST}.
+    {ok, MidAST} = erlang:apply(Mutation, [AST, Loc]),
+    NewAST = apply_extras(MidAST, Loc),
+    {File, Name, Item, Loc, NewAST}.
 
 %% Internal functions ----------------------------
 

@@ -14,23 +14,23 @@
 							    [File]) 
 					end).
 
--define(MUTATION_EXCHANGE(From, To), fun(File, Loc) ->
+-define(MUTATION_EXCHANGE(From, To), fun(AST, Loc) ->
 					  ?FULL_TD_TP([?RULE(?T(From), 
 							     ?TO_AST(To), 
 							     api_refac:start_end_loc(_This@)==Loc)], 
-						      [File]) 
+						      AST) 
 				  end).
 
--define(MUTATION(From, Func), fun(File, Loc) ->
+-define(MUTATION(From, Func), fun(AST, Loc) ->
 				      ?FULL_TD_TP([?RULE(?T(From), 
 							 Func, 
 							 api_refac:start_end_loc(_This@)==Loc)], 
-						  [File]) 
+						  AST)
 			      end).
 
--define(GLOBAL_MUTATION(From, Func), fun(File, Loc) ->
-				      ?FULL_TD_TP([?RULE(?T(From), 
-							 Func, 
-							 true)], 
-						  [File]) 
-			      end).
+-define(GLOBAL_MUTATION(From, Restrict, Func), fun(AST, Loc) ->
+						       ?FULL_TD_TP([?RULE(?T(From), 
+									  Func, 
+									  Restrict)], 
+								   AST) 
+					       end).

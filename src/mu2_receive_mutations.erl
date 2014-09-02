@@ -4,7 +4,6 @@
 -import(mu2_case_mutations,[swap/3,random_not_n/2]).
 -include("../include/mutations.hrl").
 
--compile(nowarn_shadow_vars).
 
 all() ->
     receive_mutations().

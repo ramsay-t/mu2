@@ -4,8 +4,8 @@
               {registered,[]},
               {applications,[kernel,stdlib]},
               {env,[]},
-              {modules,[mu2,mu2_case_mutations,mu2_datatype_mutations,
-                        mu2_exchange_mutations,mu2_extras_server,
-                        mu2_if_mutations,mu2_logger,mu2_logging_mutations,
-                        mu2_module_explorer,mu2_mutation,mu2_output,
-                        mu2_receive_mutations]}]}.
+              {modules,[mu2,mu2_binding_mutations,mu2_case_mutations,
+                        mu2_datatype_mutations,mu2_exchange_mutations,
+                        mu2_extras_server,mu2_if_mutations,mu2_logger,
+                        mu2_logging_mutations,mu2_module_explorer,
+                        mu2_mutation,mu2_output,mu2_receive_mutations]}]}.
