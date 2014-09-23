@@ -1,7 +1,6 @@
 #!/bin/bash
 
-THIS_DIR=`dirname $0`/..
-THIS_DIR=`readlink -f $THIS_DIR`
+THIS_DIR=$(cd `dirname $0`/..; pwd)
 MU2_ROOT=$THIS_DIR/
 
 if [ -d $MU2_ROOT/deps ]; then
@@ -12,7 +11,7 @@ if [ -d $MU2_ROOT/../../deps ]; then
     DEPS_DIR=$MU2_ROOT/../../deps
 fi
 
-DEPS_DIR=`readlink -f $DEPS_DIR`
+DEPS_DIR=$(cd $DEPS_DIR; pwd)
 
 MU2_EBIN=$MU2_ROOT/ebin
 WRANGLER_EBIN=$DEPS_DIR/wrangler/ebin
