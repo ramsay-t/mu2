@@ -7,6 +7,9 @@
 all() ->
     missing().
 
+is_valid_list(V@) ->
+    (?PP(V@) /= "[]") and (api_refac:exported_vars(V@) == []).
+
 missing() ->
     [
      {list_to_emptylist
@@ -14,7 +17,7 @@ missing() ->
 			  begin
 			      case api_refac:type(V@) of
 				  list ->
-				      ?PP(V@) /= "[]";
+				      is_valid_list(V@);
 				  _ ->
 				      false
 			      end
@@ -28,7 +31,7 @@ missing() ->
 			  begin
 			      case api_refac:type(V@) of
 				  list ->
-				      ?PP(V@) /= "[]";
+				     is_valid_list(V@);
 				  _ ->
 				      false
 			      end
@@ -42,7 +45,7 @@ missing() ->
 			  begin
 			      case api_refac:type(V@) of
 				  list ->
-				      ?PP(V@) /= "[]";
+				      is_valid_list(V@);
 				  _ ->
 				      false
 			      end

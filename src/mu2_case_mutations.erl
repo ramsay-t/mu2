@@ -9,10 +9,45 @@
 all() ->
     case_mutations().
 
+all_constant(P) ->
+    case api_refac:type(P) of
+	atom ->
+	    true;
+	underscore ->
+	    true;
+	integer ->
+	    true;
+	tuple ->
+	    {tree,tuple,_Attrs,Content} = P,
+	    length(lists:filter(fun all_constant/1,Content)) == length(Content);
+	variable ->
+	    false;
+	list ->
+	    false;
+	nil ->
+	    true;
+	_ ->
+	    false
+    end.
+
+is_valid_pattern(Ps) ->
+    %% We must have no all-constant entries
+    length(lists:filter(fun all_constant/1,Ps)) == 0.
+
+is_valid_pattern_set(Pats@@@) ->
+    if length(Pats@@@) > 1 ->
+	    %% We need at least non-constant patterns
+	    length(lists:filter(fun is_valid_pattern/1, Pats@@@)) > 1;
+       true ->
+	    false
+    end.
+
+
 case_mutations() ->
     [{swap_case_order,
       ?MUTATION_RESTRICT("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end",
-			 length(Pats@@@) > 1),
+			 is_valid_pattern_set(Pats@@@)
+			),
       ?MUTATION("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end",
 		begin
 		    A = random:uniform(length(Pats@@@)),
@@ -24,7 +59,7 @@ case_mutations() ->
 		end)},
      {exchange_case_guard,
       ?MUTATION_RESTRICT("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end",
-			 length(Pats@@@) > 1),
+			 (length(Pats@@@) > 1) and (lists:flatten(lists:map(fun api_refac:exported_vars/1, Pats@@@)) == [])),
       ?MUTATION("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end",
 		begin
 		    A = random:uniform(length(Pats@@@)),
@@ -34,7 +69,7 @@ case_mutations() ->
 		end)},
      {exchange_case_pattern,
       ?MUTATION_RESTRICT("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end",
-			 length(Pats@@@) > 1),
+			 (length(Pats@@@) > 1) and (lists:flatten(lists:map(fun api_refac:exported_vars/1, Pats@@@)) == [])),
       ?MUTATION("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end",
 		begin
 		    A = random:uniform(length(Pats@@@)),
