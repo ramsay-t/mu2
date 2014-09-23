@@ -1,6 +1,6 @@
 #!/bin/bash
 if [ -d deps ]; then
-    DEPS_DIR= deps;
+    DEPS_DIR=deps;
 fi
 
 if [ -d ../../deps ]; then
