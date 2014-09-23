@@ -47,16 +47,15 @@ random_mutation(File, PosMuts) ->
 more_mutants(_File, [], _Number, _OutputFolder) ->
     io:format("No more mutations possible.~n"),
     [];
-%% Checks Number exactly 0; this allows you to use -1 to generate ALL possible mutants
+%% Checks Number is exactly 0; this allows you to use -1 to generate ALL possible mutants
 more_mutants(_File, _PosMuts, Number, _OutputFolder) when (Number == 0) ->
     [];
 more_mutants(File, PosMuts, Number, OutputFolder) ->
     {File, Name, Item, Loc, ST} = random_mutation(File, PosMuts),
     MutantName = mu2_output:make_mutant_name(File, Name, Loc),
-    mu2_output:write_mutant(OutputFolder, MutantName, {File, Name, Item, Loc, ST}),
+    mu2_output:write_mutant(OutputFolder, MutantName, ST),
     {Pre, Post} = lists:split(Item, PosMuts),
     OtherPosMuts = lists:sublist(Pre, Item-1) ++ Post,
-    io:format("Choosing ~p more mutants from ~p possiblities...~n", [Number-1, length(OtherPosMuts)]),
     [{MutantName, Name, Loc} | more_mutants(File, OtherPosMuts, Number-1, OutputFolder)].
 
 possible_mutations(File, Ms) ->

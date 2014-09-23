@@ -6,8 +6,8 @@
 
 -include("../include/mutations.hrl").
 
-write_mutant(Folder, MutantName, {File, Name, _Item, Loc, ST}) ->
-    Text = make_file_content(File, Name, Loc, MutantName, ST),
+write_mutant(Folder, MutantName, ST) ->
+    Text = make_file_content(MutantName, ST),
     case Folder of
 	[] ->
 	    FullName = MutantName;
@@ -31,7 +31,8 @@ rename_module(ST, NewName) ->
 		       ?TO_AST("-module(" ++ NewName ++ ")"),
 		       true)], 
 		ST).
-make_file_content(File, Name, Loc, MutantName, ST) ->
+
+make_file_content(MutantName, ST) ->
     case lists:suffix(".erl", MutantName) of
 	true ->
 	    NewMName = get_module_name_from_filename(MutantName);
@@ -39,10 +40,8 @@ make_file_content(File, Name, Loc, MutantName, ST) ->
 	    NewMName = MutantName
     end,
     {ok, NST} = rename_module(ST, NewMName),
-    "%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n" ++
-	lists:flatten(io_lib:format("%% Generated from ~p~n%% Applied rule ~p at location ~p~n", [File, Name, Loc])) ++
-	"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\n" ++
     wrangler_prettypr:print_ast('unix',NST) ++ "\n".
     
 get_module_name_from_filename(MutantName) ->
     lists:reverse(lists:nthtail(4, lists:reverse(filename:basename(MutantName)))).
+
