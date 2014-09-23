@@ -61,7 +61,7 @@ case_mutations() ->
       ?MUTATION_RESTRICT("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end",
 			 (length(Pats@@@) > 1) 
 			 and (lists:flatten(lists:map(fun api_refac:exported_vars/1, Pats@@@)) == [])
-			 and (lists:flatten(lists:filter(fun(G) -> length(G) > 0 end, Guards@@@)))
+			 and (length(lists:filter(fun(G) -> length(G) > 0 end, Guards@@@)) > 0)
 			),
       ?MUTATION("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end",
 		begin
