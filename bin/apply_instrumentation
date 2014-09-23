@@ -1,9 +1,21 @@
 #!/bin/bash
 
-MU2_ROOT=/Users/ramsay/Dropbox/mu2
+THIS_DIR=`dirname $0`/..
+THIS_DIR=`readlink -f $THIS_DIR`
+MU2_ROOT=$THIS_DIR/
+
+if [ -d $MU2_ROOT/deps ]; then
+    DEPS_DIR=$MU2_ROOT/deps;
+fi
+
+if [ -d $MU2_ROOT/../../deps ]; then
+    DEPS_DIR=$MU2_ROOT/../../deps
+fi
+
+DEPS_DIR=`readlink -f $DEPS_DIR`
 
 MU2_EBIN=$MU2_ROOT/ebin
-WRANGLER_EBIN=$MU2_ROOT/../wrangler/ebin
+WRANGLER_EBIN=$DEPS_DIR/wrangler/ebin
 
 MU2_COMMAND="mu2_logging_mutations apply_logging $@"
 
