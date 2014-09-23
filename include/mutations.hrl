@@ -22,7 +22,7 @@
 				  end).
 
 -define(MUTATION(From, Func), fun(AST, Loc) ->
-				      ?FULL_TD_TP([?RULE(?T(From), 
+				      ?STOP_TD_TP([?RULE(?T(From), 
 							 Func, 
 							 api_refac:start_end_loc(_This@)==Loc)], 
 						  AST)

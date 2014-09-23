@@ -1,6 +1,7 @@
 -module(mu2_extras_server).
 
 -behaviour(gen_server).
+-include("../include/mutations.hrl").
 
 -export([start_link/0]).
 -export([init/1, handle_call/3]).
@@ -48,10 +49,13 @@ pop_first() ->
     gen_server:call(mu2_extras,pop_first).
     
 
-add(F) ->
+%% add(Template,Restrict,Fun) ->
+%%     start_if_needed(),
+%%     gen_server:call(mu2_extras,{add,?GLOBAL_MUTATION(Template,Restrict,Fun)}).
+
+add(F) ->    
     start_if_needed(),
     gen_server:call(mu2_extras,{add,F}).
-    
 
 %% Unimplemented deliberately
 handle_cast(_,_) ->
