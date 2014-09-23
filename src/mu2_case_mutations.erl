@@ -59,7 +59,10 @@ case_mutations() ->
 		end)},
      {exchange_case_guard,
       ?MUTATION_RESTRICT("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end",
-			 (length(Pats@@@) > 1) and (lists:flatten(lists:map(fun api_refac:exported_vars/1, Pats@@@)) == [])),
+			 (length(Pats@@@) > 1) 
+			 and (lists:flatten(lists:map(fun api_refac:exported_vars/1, Pats@@@)) == [])
+			 and (lists:flatten(lists:filter(fun(G) -> length(G) > 0 end, Guards@@@)))
+			),
       ?MUTATION("case Expr@ of Pats@@@ when Guards@@@ -> Body@@@ end",
 		begin
 		    A = random:uniform(length(Pats@@@)),
