@@ -89,7 +89,7 @@ relational() ->
     ,{le_to_lt, ?MUTATION_MATCH("X@ =< Y@"), ?MUTATION_EXCHANGE("X@ =< Y@", "X@ < Y@")}
     ,{le_to_eq, ?MUTATION_MATCH("X@ =< Y@"), ?MUTATION_EXCHANGE("X@ =< Y@", "X@ == Y@")}
     ,{le_to_gt, ?MUTATION_MATCH("X@ =< Y@"), ?MUTATION_EXCHANGE("X@ =< Y@", "X@ > Y@")}
-    ,{le_to_ge, ?MUTATION_MATCH("X@ =< Y@"), ?MUTATION_EXCHANGE("X@ =< Y@", "X@ =< Y@")}
+    ,{le_to_ge, ?MUTATION_MATCH("X@ =< Y@"), ?MUTATION_EXCHANGE("X@ =< Y@", "X@ >= Y@")}
     ,{le_to_ne, ?MUTATION_MATCH("X@ =< Y@"), ?MUTATION_EXCHANGE("X@ =< Y@", "X@ /= Y@")}
     ,{le_to_te, ?MUTATION_MATCH("X@ =< Y@"), ?MUTATION_EXCHANGE("X@ =< Y@", "X@ =:= Y@")}
     ,{le_to_nte, ?MUTATION_MATCH("X@ =< Y@"), ?MUTATION_EXCHANGE("X@ =< Y@", "X@ =/= Y@")}
