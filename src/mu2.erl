@@ -25,6 +25,7 @@ one_test(Dir,Module,MutantFile,TestFun) ->
 			atom_to_list(Module);
 		    _ ->
 			Module
-		end,
+		end ++ ".erl",
     mu2_output:write_mutant(Dir,ModString,MuST),
+    compile:file(filename:join(Dir,ModString)),
     TestFun().

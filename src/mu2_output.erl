@@ -12,7 +12,7 @@ write_mutant(Folder, MutantName, ST) ->
 	[] ->
 	    FullName = MutantName;
 	_ ->
-	    FullName = Folder ++ "/" ++ MutantName
+	    FullName = filename:join(Folder,MutantName)
     end,
     io:format("Writing ~p...~n", [FullName]),
     {ok, IODevice} = file:open(FullName, [write]),
@@ -21,7 +21,6 @@ write_mutant(Folder, MutantName, ST) ->
 
 make_mutant_name(File, MuName, {{SL,SC},{EL,EC}}) ->
     filename:basename(File, ".erl") ++ lists:flatten(io_lib:format("_~p_~p_~p_~p_~p", [MuName,SL,SC,EL,EC])) ++ ".erl".
-
 
 %% Internal functions
 
